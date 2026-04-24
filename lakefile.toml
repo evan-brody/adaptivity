@@ -8,3 +8,7 @@ name = "Adaptivity"
 [[lean_exe]]
 name = "adaptivity"
 root = "Main"
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"

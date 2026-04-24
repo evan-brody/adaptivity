@@ -1,0 +1,10 @@
+name = "adaptivity"
+version = "0.1.0"
+defaultTargets = ["adaptivity"]
+
+[[lean_lib]]
+name = "Adaptivity"
+
+[[lean_exe]]
+name = "adaptivity"
+root = "Main"

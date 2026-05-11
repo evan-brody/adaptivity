@@ -1,7 +1,7 @@
 /-
   The Additive Adaptivity Gap for Two-Coin Sequential Stopping is 1/2
 
-  We prove: for 0 ≤ p₁ ≤ pₙ ≤ 1 with p₁+pₙ ≤ 1 (and 0 < pₙ < 1), the minimum
+  We prove: for 0 ≤ p₁ ≤ pₙ ≤ 1 with p₁+pₙ ≤ 1, the minimum
   of three nonadaptive expected costs C₁, C₂, C₄ is at most
   `min (A₁ p₁ pₙ) (Aₙ p₁ pₙ) + 1/2`, where A₁, Aₙ are the two adaptive
   costs. Since `Aₙ ≤ A₁` under our hypotheses (`Aₙ_le_A₁`), this RHS
@@ -67,15 +67,15 @@ theorem quad_6_4_25_pos (pₙ : ℝ) : 0 < 6*pₙ^2 - 4*pₙ + 25 := by
 theorem P_pos (pₙ : ℝ) : 0 < P pₙ := by
   unfold P; nlinarith [sq_nonneg ((2*pₙ - 1)*(8*pₙ - 5)), sq_nonneg (22*pₙ - 15)]
 
-theorem g_nonneg {pₙ : ℝ} (hq1 : 1/2 ≤ pₙ) : 0 ≤ g pₙ := by
+theorem g_nonneg {pₙ : ℝ} (hpₙ1 : 1/2 ≤ pₙ) : 0 ≤ g pₙ := by
   unfold g
-  by_cases hq23 : pₙ ≤ 2/3
+  by_cases hpₙ23 : pₙ ≤ 2/3
   · -- g = 2pₙ(2pₙ-1)² + (2-3pₙ), both nonneg
     nlinarith [sq_nonneg (2*pₙ - 1)]
-  · push Not at hq23
+  · push Not at hpₙ23
     nlinarith [sq_nonneg (2*pₙ - 1), sq_nonneg (32*pₙ - 25)]
 
-theorem quartic_nonneg {pₙ : ℝ} (hq : 2/3 ≤ pₙ) :
+theorem quartic_nonneg {pₙ : ℝ} (hpₙ : 2/3 ≤ pₙ) :
     0 ≤ 2*pₙ^4 - 4*pₙ^3 + 11*pₙ^2 - 9*pₙ + 2 := by
   nlinarith [sq_nonneg (3*pₙ - 2), quad_6_4_25_pos pₙ]
 
@@ -110,28 +110,28 @@ theorem L₃_complete_square (p₁ pₙ : ℝ) :
 /-! ## Case A: L₂ ≥ 0 for pₙ ≤ 1/2 -/
 
 theorem L₂_nonneg_of_q_le_half {p₁ pₙ : ℝ}
-    (hp : 0 ≤ p₁) (hpq : p₁ ≤ pₙ) (hpq1 : p₁ + pₙ ≤ 1) (hq : pₙ ≤ 1/2) :
+    (hp₁ : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hp₁pₙ1 : p₁ + pₙ ≤ 1) (hpₙ : pₙ ≤ 1/2) :
     0 ≤ L₂ p₁ pₙ := by
   unfold L₂
-  by_cases hq3 : pₙ ≤ 1/3
+  by_cases hpₙ3 : pₙ ≤ 1/3
   · nlinarith [sq_nonneg (1 - pₙ)]
-  · push Not at hq3; nlinarith
+  · push Not at hpₙ3; nlinarith
 
 /-! ## Case B: L₃ ≥ 0 for 1/2 < pₙ ≤ 2/3 -/
 
 theorem L₃_nonneg_case1 {p₁ pₙ : ℝ}
-    (hp : 0 ≤ p₁) (hq12 : 1/2 ≤ pₙ)
+    (hp₁ : 0 ≤ p₁) (hpₙ12 : 1/2 ≤ pₙ)
     (hcoeff : pₙ^2 + 3*pₙ ≤ 2) :
     0 ≤ L₃ p₁ pₙ := by
   -- L₃ = 2(2pₙ-1)p₁² + (2-3pₙ-pₙ²)p₁ + pₙ(1-pₙ)(2pₙ-1): all terms nonneg
   unfold L₃ R₃; nlinarith [sq_nonneg p₁, sq_nonneg (1 - pₙ)]
 
 theorem L₃_nonneg_case2 {p₁ pₙ : ℝ}
-    (hp : 0 ≤ p₁) (hpq1 : p₁ + pₙ ≤ 1) (hq12 : 1/2 ≤ pₙ)
-    (hq23 : pₙ ≤ 2/3) (hcoeff : 2 < pₙ^2 + 3*pₙ) :
+    (hp₁ : 0 ≤ p₁) (hp₁pₙ1 : p₁ + pₙ ≤ 1) (hpₙ12 : 1/2 ≤ pₙ)
+    (hpₙ23 : pₙ ≤ 2/3) (hcoeff : 2 < pₙ^2 + 3*pₙ) :
     0 ≤ L₃ p₁ pₙ := by
   -- pₙ²+3pₙ > 2 forces pₙ > 27/50
-  have hq27 : 27/50 ≤ pₙ := by
+  have hpₙ27 : 27/50 ≤ pₙ := by
     by_contra h; push Not at h
     nlinarith [mul_nonneg (show (0:ℝ) ≤ 27/50 - pₙ by linarith)
                           (show (0:ℝ) ≤ 27/50 + pₙ + 3 by linarith)]
@@ -147,13 +147,13 @@ theorem L₃_nonneg_case2 {p₁ pₙ : ℝ}
   nlinarith [sq_nonneg (4*(2*pₙ - 1)*p₁ - (pₙ^2 + 3*pₙ - 2))]
 
 theorem L₃_nonneg_of_q_le_two_thirds {p₁ pₙ : ℝ}
-    (hp : 0 ≤ p₁) (hpq1 : p₁ + pₙ ≤ 1)
-    (hq12 : 1/2 ≤ pₙ) (hq23 : pₙ ≤ 2/3) :
+    (hp₁ : 0 ≤ p₁) (hp₁pₙ1 : p₁ + pₙ ≤ 1)
+    (hpₙ12 : 1/2 ≤ pₙ) (hpₙ23 : pₙ ≤ 2/3) :
     0 ≤ L₃ p₁ pₙ := by
   by_cases hcoeff : pₙ^2 + 3*pₙ ≤ 2
-  · exact L₃_nonneg_case1 hp hq12 hcoeff
+  · exact L₃_nonneg_case1 hp₁ hpₙ12 hcoeff
   · push Not at hcoeff
-    exact L₃_nonneg_case2 hp hpq1 hq12 hq23 hcoeff
+    exact L₃_nonneg_case2 hp₁ hp₁pₙ1 hpₙ12 hpₙ23 hcoeff
 
 /-! ## Step 3a: L₃ ≤ 0 ⟹ p₁M ≥ (1-pₙ)²
 
@@ -162,28 +162,28 @@ theorem L₃_nonneg_of_q_le_two_thirds {p₁ pₙ : ℝ}
 -/
 
 theorem Delta_nonneg_of_L₃_nonpos {p₁ pₙ : ℝ}
-    (hp : 0 ≤ p₁) (hpq1 : p₁ + pₙ ≤ 1)
-    (hq23 : 2/3 ≤ pₙ) (hL3 : L₃ p₁ pₙ ≤ 0) :
+    (hp₁ : 0 ≤ p₁) (hp₁pₙ1 : p₁ + pₙ ≤ 1)
+    (hpₙ23 : 2/3 ≤ pₙ) (hL3 : L₃ p₁ pₙ ≤ 0) :
     (1 - pₙ)^2 ≤ p₁ * M pₙ := by
   by_contra h_neg
   push Not at h_neg
   have hfact := L₃_factorization p₁ pₙ
   have hM := M_pos pₙ
-  have h_pm_nn : 0 ≤ p₁ * M pₙ := mul_nonneg hp (le_of_lt hM)
+  have h_pm_nn : 0 ≤ p₁ * M pₙ := mul_nonneg hp₁ (le_of_lt hM)
   have h_sq_pos : 0 < (1 - pₙ) ^ 2 := by linarith
-  have h1q_nn : 0 ≤ 1 - pₙ := by linarith
-  have h1q_pos : 0 < 1 - pₙ := by
-    by_contra h1q; push Not at h1q
-    -- From h1q : 1-pₙ ≤ 0 and h1q_nn : 0 ≤ 1-pₙ: 1-pₙ = 0, so (1-pₙ)² = 0
-    have := le_antisymm h1q h1q_nn
+  have h1pₙ_nn : 0 ≤ 1 - pₙ := by linarith
+  have h1pₙ_pos : 0 < 1 - pₙ := by
+    by_contra h1pₙ; push Not at h1pₙ
+    -- From h1pₙ : 1-pₙ ≤ 0 and h1pₙ_nn : 0 ≤ 1-pₙ: 1-pₙ = 0, so (1-pₙ)² = 0
+    have := le_antisymm h1pₙ h1pₙ_nn
     nlinarith  -- contradicts h_sq_pos
-  have hq_pos : 0 < pₙ := by linarith
-  have h2q1 : 0 ≤ 2*pₙ - 1 := by linarith
+  have hpₙ_pos : 0 < pₙ := by linarith
+  have h2pₙ1 : 0 ≤ 2*pₙ - 1 := by linarith
   -- Q ≤ 0: Q is linear increasing in p₁; at max p₁ it equals -(quartic) ≤ 0
   have hQ : 2 * M pₙ * (2*pₙ - 1) * p₁ - pₙ*(2*pₙ^3 + pₙ - 1) ≤ 0 := by
     have : 2 * M pₙ * (2*pₙ - 1) * p₁ ≤ 2*(2*pₙ - 1)*(1 - pₙ)^2 := by
-      nlinarith [mul_nonneg h2q1 (show 0 ≤ (1-pₙ)^2 - p₁*M pₙ by linarith)]
-    nlinarith [quartic_nonneg hq23]
+      nlinarith [mul_nonneg h2pₙ1 (show 0 ≤ (1-pₙ)^2 - p₁*M pₙ by linarith)]
+    nlinarith [quartic_nonneg hpₙ23]
   -- Δ·Q ≥ 0: both factors ≤ 0, product ≥ 0
   have hprod : 0 ≤ (p₁ * M pₙ - (1 - pₙ)^2) *
       (2 * M pₙ * (2*pₙ - 1) * p₁ - pₙ*(2*pₙ^3 + pₙ - 1)) := by
@@ -191,7 +191,7 @@ theorem Delta_nonneg_of_L₃_nonpos {p₁ pₙ : ℝ}
                           (show 0 ≤ pₙ*(2*pₙ^3+pₙ-1) - 2*M pₙ*(2*pₙ-1)*p₁ by linarith)]
   -- M²L₃ = pₙ²(1-pₙ)P + (≥0) > 0
   have hP_pos : 0 < pₙ^2 * (1 - pₙ) * P pₙ :=
-    mul_pos (mul_pos (pow_pos hq_pos 2) h1q_pos) (P_pos pₙ)
+    mul_pos (mul_pos (pow_pos hpₙ_pos 2) h1pₙ_pos) (P_pos pₙ)
   -- But M²L₃ ≤ 0 since M² ≥ 0 and L₃ ≤ 0
   nlinarith [sq_nonneg (M pₙ), mul_nonneg (sq_nonneg (M pₙ)) (show 0 ≤ -L₃ p₁ pₙ by linarith)]
 
@@ -203,21 +203,21 @@ theorem Delta_nonneg_of_L₃_nonpos {p₁ pₙ : ℝ}
 -/
 
 theorem L₅_nonneg_of_Delta_nonneg {p₁ pₙ : ℝ}
-    (hp : 0 ≤ p₁) (hpq : p₁ ≤ pₙ) (hpq1 : p₁ + pₙ ≤ 1)
-    (hq12 : 1/2 < pₙ) (hDelta : (1 - pₙ)^2 ≤ p₁ * M pₙ) :
+    (hp₁ : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hp₁pₙ1 : p₁ + pₙ ≤ 1)
+    (hpₙ12 : 1/2 < pₙ) (hDelta : (1 - pₙ)^2 ≤ p₁ * M pₙ) :
     0 ≤ L₅ p₁ pₙ := by
   have hmaster := concavity_master_identity p₁ pₙ
   have hM := M_pos pₙ
-  have h2q1 : 0 < 2*pₙ - 1 := by linarith
-  have h1qp : 0 ≤ 1 - pₙ - p₁ := by linarith
+  have h2pₙ1 : 0 < 2*pₙ - 1 := by linarith
+  have h1pₙp₁ : 0 ≤ 1 - pₙ - p₁ := by linarith
   have hDelta' : 0 ≤ p₁ * M pₙ - (1 - pₙ)^2 := by linarith
-  have hq_nn : 0 ≤ pₙ := by linarith
+  have hpₙ_nn : 0 ≤ pₙ := by linarith
   -- Term 1: (1-pₙ-p₁)pₙP ≥ 0
   have hterm1 : 0 ≤ (1 - pₙ - p₁) * pₙ * P pₙ :=
-    mul_nonneg (mul_nonneg h1qp hq_nn) (le_of_lt (P_pos pₙ))
+    mul_nonneg (mul_nonneg h1pₙp₁ hpₙ_nn) (le_of_lt (P_pos pₙ))
   -- Term 2: MΔg ≥ 0
   have hterm2 : 0 ≤ M pₙ * (p₁ * M pₙ - (1 - pₙ)^2) * g pₙ :=
-    mul_nonneg (mul_nonneg (le_of_lt hM) hDelta') (g_nonneg (le_of_lt hq12))
+    mul_nonneg (mul_nonneg (le_of_lt hM) hDelta') (g_nonneg (le_of_lt hpₙ12))
   -- Term 3: -Δ(1-pₙ-p₁)(2pₙ-1)E ≥ 0 since -E ≥ 0
   have hnE : 0 ≤ -E p₁ pₙ := by
     rw [neg_E_decomp]; nlinarith [quad_6_8_3_pos pₙ]
@@ -225,14 +225,14 @@ theorem L₅_nonneg_of_Delta_nonneg {p₁ pₙ : ℝ}
     have key : -(p₁ * M pₙ - (1 - pₙ)^2) * (1 - pₙ - p₁) * (2*pₙ - 1) * E p₁ pₙ =
         (p₁ * M pₙ - (1 - pₙ)^2) * (1 - pₙ - p₁) * (2*pₙ - 1) * (-E p₁ pₙ) := by ring
     rw [key]
-    exact mul_nonneg (mul_nonneg (mul_nonneg hDelta' h1qp) (le_of_lt h2q1)) hnE
+    exact mul_nonneg (mul_nonneg (mul_nonneg hDelta' h1pₙp₁) (le_of_lt h2pₙ1)) hnE
   -- (2pₙ-1)ML₅ = sum of three nonneg terms ≥ 0
   have h_key : 0 ≤ (2*pₙ - 1) * M pₙ * L₅ p₁ pₙ := by linarith
   -- Since (2pₙ-1)M > 0 and (2pₙ-1)M·L₅ ≥ 0: L₅ ≥ 0
   -- Proof: if L₅ < 0, then (2pₙ-1)M·L₅ < (2pₙ-1)M·0 = 0, contradicting h_key
   by_contra h_neg
   push Not at h_neg
-  have h_prod_pos : 0 < (2*pₙ - 1) * M pₙ := mul_pos h2q1 hM
+  have h_prod_pos : 0 < (2*pₙ - 1) * M pₙ := mul_pos h2pₙ1 hM
   have := mul_lt_mul_of_pos_left h_neg h_prod_pos
   rw [mul_zero] at this
   linarith
@@ -240,27 +240,27 @@ theorem L₅_nonneg_of_Delta_nonneg {p₁ pₙ : ℝ}
 /-! ## Polynomial Core -/
 
 theorem polynomial_core {p₁ pₙ : ℝ}
-    (hp : 0 ≤ p₁) (hpq : p₁ ≤ pₙ) (hpq1 : p₁ + pₙ ≤ 1) :
+    (hp₁ : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hp₁pₙ1 : p₁ + pₙ ≤ 1) :
     0 ≤ L₂ p₁ pₙ ∨ 0 ≤ L₃ p₁ pₙ ∨ 0 ≤ L₅ p₁ pₙ := by
-  by_cases hq12 : pₙ ≤ 1/2
+  by_cases hpₙ12 : pₙ ≤ 1/2
   · -- Case A: pₙ ≤ 1/2 → L₂ ≥ 0
-    exact Or.inl (L₂_nonneg_of_q_le_half hp hpq hpq1 hq12)
-  · push Not at hq12
-    -- hq12 : 1/2 < pₙ (strict!)
-    by_cases hq23 : pₙ ≤ 2/3
+    exact Or.inl (L₂_nonneg_of_q_le_half hp₁ hp₁pₙ hp₁pₙ1 hpₙ12)
+  · push Not at hpₙ12
+    -- hpₙ12 : 1/2 < pₙ (strict!)
+    by_cases hpₙ23 : pₙ ≤ 2/3
     · -- Case B: 1/2 < pₙ ≤ 2/3 → L₃ ≥ 0
       exact Or.inr (Or.inl
-        (L₃_nonneg_of_q_le_two_thirds hp hpq1 (le_of_lt hq12) hq23))
-    · push Not at hq23
+        (L₃_nonneg_of_q_le_two_thirds hp₁ hp₁pₙ1 (le_of_lt hpₙ12) hpₙ23))
+    · push Not at hpₙ23
       -- Case C: pₙ > 2/3
       by_cases hL3 : 0 ≤ L₃ p₁ pₙ
       · exact Or.inr (Or.inl hL3)
       · push Not at hL3
         -- L₃ < 0, pₙ > 2/3: Step 3a gives Δ ≥ 0, Step 3b gives L₅ ≥ 0
-        have hDelta := Delta_nonneg_of_L₃_nonpos hp hpq1
-          (le_of_lt hq23) (le_of_lt hL3)
+        have hDelta := Delta_nonneg_of_L₃_nonpos hp₁ hp₁pₙ1
+          (le_of_lt hpₙ23) (le_of_lt hL3)
         exact Or.inr (Or.inr
-          (L₅_nonneg_of_Delta_nonneg hp hpq hpq1 hq12 hDelta))
+          (L₅_nonneg_of_Delta_nonneg hp₁ hp₁pₙ hp₁pₙ1 hpₙ12 hDelta))
 
 lemma nonpos_of_div_nonpos_of_pos {x d : ℝ} (hd : 0 < d) (h : x / d ≤ 0) :
     x ≤ 0 := by
@@ -291,95 +291,95 @@ lemma Aₙ_le_A₁ {p₁ pₙ : ℝ} (hp₁pₙ : p₁ ≤ pₙ) (hs : p₁ + p�
   linarith [mul_neg_of_neg_of_pos h_neg hden]
 
 lemma C₁_normalized {p₁ pₙ : ℝ}
-    (hq : 0 < pₙ) (hp1 : p₁ < 1) (hq1 : pₙ < 1) :
+    (hpₙ : 0 < pₙ) (hp₁1 : p₁ < 1) (hpₙ1 : pₙ < 1) :
     C₁ p₁ pₙ - Aₙ p₁ pₙ - (1 / 2 : ℝ)
       = -(L₂ p₁ pₙ) / (2 * ((1 - pₙ) * (1 - p₁))) := by
-  have hq0 : pₙ ≠ 0 := ne_of_gt hq
-  have hp0 : 1 - p₁ ≠ 0 := by linarith
-  have hq10 : 1 - pₙ ≠ 0 := by linarith
+  have hpₙ0 : pₙ ≠ 0 := ne_of_gt hpₙ
+  have hp₁0 : 1 - p₁ ≠ 0 := by linarith
+  have hpₙ10 : 1 - pₙ ≠ 0 := by linarith
   unfold C₁ Aₙ L₂
   field_simp
   ring
 
 lemma C₂_normalized {p₁ pₙ : ℝ}
-    (hq : 0 < pₙ) (hp1 : p₁ < 1) (hq1 : pₙ < 1) :
+    (hpₙ : 0 < pₙ) (hp₁1 : p₁ < 1) (hpₙ1 : pₙ < 1) :
     C₂ p₁ pₙ - Aₙ p₁ pₙ - (1 / 2 : ℝ)
       = -(L₃ p₁ pₙ) / (2 * (pₙ * (1 - p₁) * (1 - pₙ))) := by
-  have hq0 : pₙ ≠ 0 := ne_of_gt hq
-  have hp0 : 1 - p₁ ≠ 0 := by linarith
-  have hq10 : 1 - pₙ ≠ 0 := by linarith
+  have hpₙ0 : pₙ ≠ 0 := ne_of_gt hpₙ
+  have hp₁0 : 1 - p₁ ≠ 0 := by linarith
+  have hpₙ10 : 1 - pₙ ≠ 0 := by linarith
   unfold C₂ Aₙ L₃ R₃
   field_simp
   ring
 
 lemma C₄_normalized {p₁ pₙ : ℝ}
-    (hq : 0 < pₙ) (hp1 : p₁ < 1) (hq1 : pₙ < 1) :
+    (hpₙ : 0 < pₙ) (hp₁1 : p₁ < 1) (hpₙ1 : pₙ < 1) :
     C₄ p₁ pₙ - Aₙ p₁ pₙ - (1 / 2 : ℝ)
       = -(L₅ p₁ pₙ) / (2 * (pₙ * (1 - p₁) * (1 - pₙ))) := by
-  have hq0 : pₙ ≠ 0 := ne_of_gt hq
-  have hp0 : 1 - p₁ ≠ 0 := by linarith
-  have hq10 : 1 - pₙ ≠ 0 := by linarith
+  have hpₙ0 : pₙ ≠ 0 := ne_of_gt hpₙ
+  have hp₁0 : 1 - p₁ ≠ 0 := by linarith
+  have hpₙ10 : 1 - pₙ ≠ 0 := by linarith
   unfold C₄ Aₙ L₅ N₅
   field_simp
   ring
 
 lemma C₁_le_iff_L₂ {p₁ pₙ : ℝ}
-    (hq : 0 < pₙ) (hp1 : p₁ < 1) (hq1 : pₙ < 1) :
+    (hpₙ : 0 < pₙ) (hp₁1 : p₁ < 1) (hpₙ1 : pₙ < 1) :
     (C₁ p₁ pₙ - Aₙ p₁ pₙ ≤ (1 / 2 : ℝ)) ↔ 0 ≤ L₂ p₁ pₙ := by
-  have hp' : 0 < 1 - p₁ := by linarith
-  have hq' : 0 < 1 - pₙ := by linarith
+  have hp₁' : 0 < 1 - p₁ := by linarith
+  have hpₙ' : 0 < 1 - pₙ := by linarith
   have hden : 0 < 2 * ((1 - pₙ) * (1 - p₁)) := by nlinarith
   constructor
   · intro h
     have h' : C₁ p₁ pₙ - Aₙ p₁ pₙ - (1 / 2 : ℝ) ≤ 0 := by linarith
-    rw [C₁_normalized hq hp1 hq1] at h'
+    rw [C₁_normalized hpₙ hp₁1 hpₙ1] at h'
     have h'' : -(L₂ p₁ pₙ) ≤ 0 := nonpos_of_div_nonpos_of_pos hden h'
     linarith
   · intro h
     have h'' : -(L₂ p₁ pₙ) ≤ 0 := by linarith
     have h' : -(L₂ p₁ pₙ) / (2 * ((1 - pₙ) * (1 - p₁))) ≤ 0 :=
       div_nonpos_of_nonpos_of_pos h'' hden
-    rw [← C₁_normalized hq hp1 hq1] at h'
+    rw [← C₁_normalized hpₙ hp₁1 hpₙ1] at h'
     linarith
 
 lemma C₂_le_iff_L₃ {p₁ pₙ : ℝ}
-    (hq : 0 < pₙ) (hp1 : p₁ < 1) (hq1 : pₙ < 1) :
+    (hpₙ : 0 < pₙ) (hp₁1 : p₁ < 1) (hpₙ1 : pₙ < 1) :
     (C₂ p₁ pₙ - Aₙ p₁ pₙ ≤ (1 / 2 : ℝ)) ↔ 0 ≤ L₃ p₁ pₙ := by
-  have hp' : 0 < 1 - p₁ := by linarith
-  have hq' : 0 < 1 - pₙ := by linarith
-  have hden0 : 0 < pₙ * (1 - p₁) * (1 - pₙ) := mul_pos (mul_pos hq hp') hq'
+  have hp₁' : 0 < 1 - p₁ := by linarith
+  have hpₙ' : 0 < 1 - pₙ := by linarith
+  have hden0 : 0 < pₙ * (1 - p₁) * (1 - pₙ) := mul_pos (mul_pos hpₙ hp₁') hpₙ'
   have hden : 0 < 2 * (pₙ * (1 - p₁) * (1 - pₙ)) := by nlinarith
   constructor
   · intro h
     have h' : C₂ p₁ pₙ - Aₙ p₁ pₙ - (1 / 2 : ℝ) ≤ 0 := by linarith
-    rw [C₂_normalized hq hp1 hq1] at h'
+    rw [C₂_normalized hpₙ hp₁1 hpₙ1] at h'
     have h'' : -(L₃ p₁ pₙ) ≤ 0 := nonpos_of_div_nonpos_of_pos hden h'
     linarith
   · intro h
     have h'' : -(L₃ p₁ pₙ) ≤ 0 := by linarith
     have h' : -(L₃ p₁ pₙ) / (2 * (pₙ * (1 - p₁) * (1 - pₙ))) ≤ 0 :=
       div_nonpos_of_nonpos_of_pos h'' hden
-    rw [← C₂_normalized hq hp1 hq1] at h'
+    rw [← C₂_normalized hpₙ hp₁1 hpₙ1] at h'
     linarith
 
 lemma C₄_le_iff_L₅ {p₁ pₙ : ℝ}
-    (hq : 0 < pₙ) (hp1 : p₁ < 1) (hq1 : pₙ < 1) :
+    (hpₙ : 0 < pₙ) (hp₁1 : p₁ < 1) (hpₙ1 : pₙ < 1) :
     (C₄ p₁ pₙ - Aₙ p₁ pₙ ≤ (1 / 2 : ℝ)) ↔ 0 ≤ L₅ p₁ pₙ := by
-  have hp' : 0 < 1 - p₁ := by linarith
-  have hq' : 0 < 1 - pₙ := by linarith
-  have hden0 : 0 < pₙ * (1 - p₁) * (1 - pₙ) := mul_pos (mul_pos hq hp') hq'
+  have hp₁' : 0 < 1 - p₁ := by linarith
+  have hpₙ' : 0 < 1 - pₙ := by linarith
+  have hden0 : 0 < pₙ * (1 - p₁) * (1 - pₙ) := mul_pos (mul_pos hpₙ hp₁') hpₙ'
   have hden : 0 < 2 * (pₙ * (1 - p₁) * (1 - pₙ)) := by nlinarith
   constructor
   · intro h
     have h' : C₄ p₁ pₙ - Aₙ p₁ pₙ - (1 / 2 : ℝ) ≤ 0 := by linarith
-    rw [C₄_normalized hq hp1 hq1] at h'
+    rw [C₄_normalized hpₙ hp₁1 hpₙ1] at h'
     have h'' : -(L₅ p₁ pₙ) ≤ 0 := nonpos_of_div_nonpos_of_pos hden h'
     linarith
   · intro h
     have h'' : -(L₅ p₁ pₙ) ≤ 0 := by linarith
     have h' : -(L₅ p₁ pₙ) / (2 * (pₙ * (1 - p₁) * (1 - pₙ))) ≤ 0 :=
       div_nonpos_of_nonpos_of_pos h'' hden
-    rw [← C₄_normalized hq hp1 hq1] at h'
+    rw [← C₄_normalized hpₙ hp₁1 hpₙ1] at h'
     linarith
 
 /-! ## Main Theorem
@@ -390,28 +390,43 @@ lemma C₄_le_iff_L₅ {p₁ pₙ : ℝ}
   `Aₙ ≤ A₁` (`Aₙ_le_A₁`), so the RHS equals `Aₙ + 1/2`. -/
 
 theorem add_adaptivity_gap {p₁ pₙ : ℝ}
-    (hp : 0 ≤ p₁) (hpq : p₁ ≤ pₙ) (hpq1 : p₁ + pₙ ≤ 1)
-    (hq : 0 < pₙ) (hq1 : pₙ < 1) :
+    (hp₁ : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hp₁pₙ1 : p₁ + pₙ ≤ 1)
+    (hpₙ : 0 ≤ pₙ) (hpₙ1 : pₙ ≤ 1) :
     min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)
       ≤ min (A₁ p₁ pₙ) (Aₙ p₁ pₙ) + 1/2 := by
-  have hp1 : p₁ < 1 := by linarith
+  -- Boundary pₙ = 0: hypotheses force p₁ = 0; expressions degenerate via x/0 = 0
+  by_cases hpₙ_zero : pₙ = 0
+  · have hp1_zero : p₁ = 0 := le_antisymm (by linarith) hp₁
+    subst hpₙ_zero; subst hp1_zero
+    unfold A₁ Aₙ C₁ C₂ C₄
+    norm_num
+  -- Boundary pₙ = 1: p₁ + pₙ ≤ 1 forces p₁ = 0
+  by_cases hpₙ_one : pₙ = 1
+  · have hp1_zero : p₁ = 0 := le_antisymm (by linarith) hp₁
+    subst hpₙ_one; subst hp1_zero
+    unfold A₁ Aₙ C₁ C₂ C₄
+    norm_num
+  -- Interior 0 < pₙ < 1: original argument applies
+  have hpₙ_pos : 0 < pₙ := lt_of_le_of_ne hpₙ (Ne.symm hpₙ_zero)
+  have hpₙ_lt : pₙ < 1 := lt_of_le_of_ne hpₙ1 hpₙ_one
+  have hp₁1 : p₁ < 1 := by linarith
   have hmin : min (A₁ p₁ pₙ) (Aₙ p₁ pₙ) = Aₙ p₁ pₙ :=
-    min_eq_right (Aₙ_le_A₁ hpq hpq1 hq hp1)
+    min_eq_right (Aₙ_le_A₁ hp₁pₙ hp₁pₙ1 hpₙ_pos hp₁1)
   rw [hmin]
-  rcases polynomial_core hp hpq hpq1 with h | h | h
-  · have hC : C₁ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₁_le_iff_L₂ hq hp1 hq1).mpr h
+  rcases polynomial_core hp₁ hp₁pₙ hp₁pₙ1 with h | h | h
+  · have hC : C₁ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₁_le_iff_L₂ hpₙ_pos hp₁1 hpₙ_lt).mpr h
     have hle : C₁ p₁ pₙ ≤ Aₙ p₁ pₙ + 1/2 := by linarith
     calc min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)
         ≤ min (C₁ p₁ pₙ) (C₂ p₁ pₙ) := min_le_left _ _
       _ ≤ C₁ p₁ pₙ := min_le_left _ _
       _ ≤ Aₙ p₁ pₙ + 1/2 := hle
-  · have hC : C₂ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₂_le_iff_L₃ hq hp1 hq1).mpr h
+  · have hC : C₂ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₂_le_iff_L₃ hpₙ_pos hp₁1 hpₙ_lt).mpr h
     have hle : C₂ p₁ pₙ ≤ Aₙ p₁ pₙ + 1/2 := by linarith
     calc min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)
         ≤ min (C₁ p₁ pₙ) (C₂ p₁ pₙ) := min_le_left _ _
       _ ≤ C₂ p₁ pₙ := min_le_right _ _
       _ ≤ Aₙ p₁ pₙ + 1/2 := hle
-  · have hC : C₄ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₄_le_iff_L₅ hq hp1 hq1).mpr h
+  · have hC : C₄ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₄_le_iff_L₅ hpₙ_pos hp₁1 hpₙ_lt).mpr h
     have hle : C₄ p₁ pₙ ≤ Aₙ p₁ pₙ + 1/2 := by linarith
     calc min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)
         ≤ C₄ p₁ pₙ := min_le_right _ _

@@ -1,13 +1,15 @@
 name = "adaptivity"
 version = "0.1.0"
-defaultTargets = ["adaptivity"]
+defaultTargets = ["AddAdaptivityGap", "MulAdaptivityGap"]
 
 [[lean_lib]]
 name = "Adaptivity"
 
-[[lean_exe]]
-name = "adaptivity"
-root = "Main"
+[[lean_lib]]
+name = "AddAdaptivityGap"
+
+[[lean_lib]]
+name = "MulAdaptivityGap"
 
 [[require]]
 name = "mathlib"

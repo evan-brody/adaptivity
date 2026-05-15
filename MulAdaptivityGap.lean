@@ -36,7 +36,7 @@ def A₁ (p₁ pₙ : ℝ) : ℝ := 1 / (1 - p₁) + (1 - p₁) / pₙ
 
 -- The three candidate non-adaptive costs. The goal is that for every
 -- `(p₁, pₙ)` at least one of `C₁, C₂, C₃` is `≤ (6/5)·Aₙ`.
-def C₁ (pₙ : ℝ) : ℝ := (pₙ ^ 2 - pₙ + 1) / (pₙ * (1 - pₙ))
+def C₁ (pₙ : ℝ) : ℝ := 1 / pₙ + pₙ / (1 - pₙ)
 def C₂ (p₁ pₙ : ℝ) : ℝ := 1 + p₁ / (1 - pₙ) + (1 - p₁) / pₙ
 def C₃ (p₁ pₙ : ℝ) : ℝ :=
   1 + pₙ * (1 + p₁) / (1 - p₁ * pₙ) + (1 - pₙ) * (2 - p₁) / (p₁ + pₙ - p₁ * pₙ)

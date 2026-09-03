@@ -3,9 +3,8 @@
 
   We prove: for 0 ≤ p₁ ≤ pₙ ≤ 1 with p₁+pₙ ≤ 1, the minimum
   of three nonadaptive expected costs C₁, C₂, C₄ is at most
-  `min (A₁ p₁ pₙ) (Aₙ p₁ pₙ) + 1/2`, where A₁, Aₙ are the two adaptive
-  costs. Since `Aₙ ≤ A₁` under our hypotheses (`Aₙ_le_A₁`), this RHS
-  equals `Aₙ + 1/2` — i.e., some nonadaptive strategy achieves additive
+  `1/2 + Aₙ p₁ pₙ`, where Aₙ is the cheaper of the two adaptive costs on
+  this domain — i.e., some nonadaptive strategy achieves additive
   gap ≤ 1/2.
 
   The polynomial core works without division via slack polynomials L₂, L₃, L₅
@@ -28,9 +27,6 @@ noncomputable section
 
 def Aₙ (p₁ pₙ : ℝ) : ℝ :=
   pₙ / (1 - p₁) + 1 / pₙ
-
-def A₁ (p₁ pₙ : ℝ) : ℝ :=
-  1 / (1 - p₁) + (1 - p₁) / pₙ
 
 def C₁ (_p₁ pₙ : ℝ) : ℝ :=
   1 / pₙ + pₙ / (1 - pₙ)
@@ -274,22 +270,6 @@ lemma div_nonpos_of_nonpos_of_pos {x d : ℝ} (hx : x ≤ 0) (hd : 0 < d) :
   have hdinv : 0 ≤ d⁻¹ := by positivity
   simpa [div_eq_mul_inv] using mul_nonpos_of_nonpos_of_nonneg hx hdinv
 
-/-- `Aₙ ≤ A₁` when `p₁ ≤ pₙ` and `p₁ + pₙ ≤ 1`. The key algebraic identity is
-`(A₁ − Aₙ) · pₙ(1-p₁) = (pₙ − p₁)(1 − p₁ − pₙ)`; both factors on the right are
-nonneg under our hypotheses, so the difference has the same sign. -/
-lemma Aₙ_le_A₁ {p₁ pₙ : ℝ} (hp₁pₙ : p₁ ≤ pₙ) (hs : p₁ + pₙ ≤ 1)
-    (hpₙ0 : 0 < pₙ) (_hp₁1 : p₁ < 1) : Aₙ p₁ pₙ ≤ A₁ p₁ pₙ := by
-  have h1p₁ : (0 : ℝ) < 1 - p₁ := by linarith
-  suffices h : 0 ≤ A₁ p₁ pₙ - Aₙ p₁ pₙ by linarith
-  have hkey : (A₁ p₁ pₙ - Aₙ p₁ pₙ) * (pₙ * (1 - p₁)) =
-      (pₙ - p₁) * (1 - p₁ - pₙ) := by
-    unfold A₁ Aₙ; field_simp; ring
-  have hnum : 0 ≤ (pₙ - p₁) * (1 - p₁ - pₙ) :=
-    mul_nonneg (by linarith) (by linarith)
-  have hden : (0 : ℝ) < pₙ * (1 - p₁) := mul_pos hpₙ0 h1p₁
-  by_contra h_neg; simp only [not_le] at h_neg
-  linarith [mul_neg_of_neg_of_pos h_neg hden]
-
 lemma C₁_normalized {p₁ pₙ : ℝ}
     (hpₙ : 0 < pₙ) (hp₁1 : p₁ < 1) (hpₙ1 : pₙ < 1) :
     C₁ p₁ pₙ - Aₙ p₁ pₙ - (1 / 2 : ℝ)
@@ -385,51 +365,49 @@ lemma C₄_le_iff_L₅ {p₁ pₙ : ℝ}
 /-! ## Main Theorem
 
   At least one of the three nonadaptive costs C₁, C₂, C₄ is within 1/2 of
-  the better of the two adaptive costs. Equivalently,
-  `min (C₁, C₂, C₄) ≤ min (A₁, Aₙ) + 1/2`. Under our hypotheses
-  `Aₙ ≤ A₁` (`Aₙ_le_A₁`), so the RHS equals `Aₙ + 1/2`. -/
+  the better adaptive cost: `min (C₁, C₂, C₄) ≤ 1/2 + Aₙ`. This is the
+  strongest form of the statement: the other adaptive cost dominates Aₙ
+  on this domain, by the identity
+  `(A₁ − Aₙ) · pₙ(1 − p₁) = (pₙ − p₁)(1 − p₁ − pₙ) ≥ 0`. -/
 
 theorem add_adaptivity_gap {p₁ pₙ : ℝ}
     (hp₁ : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hp₁pₙ1 : p₁ + pₙ ≤ 1)
     (hpₙ : 0 ≤ pₙ) (hpₙ1 : pₙ ≤ 1) :
     min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)
-      ≤ min (A₁ p₁ pₙ) (Aₙ p₁ pₙ) + 1/2 := by
+      ≤ 1/2 + Aₙ p₁ pₙ := by
   -- Boundary pₙ = 0: hypotheses force p₁ = 0; expressions degenerate via x/0 = 0
   by_cases hpₙ_zero : pₙ = 0
   · have hp1_zero : p₁ = 0 := le_antisymm (by linarith) hp₁
     subst hpₙ_zero; subst hp1_zero
-    unfold A₁ Aₙ C₁ C₂ C₄
+    unfold Aₙ C₁ C₂ C₄
     norm_num
   -- Boundary pₙ = 1: p₁ + pₙ ≤ 1 forces p₁ = 0
   by_cases hpₙ_one : pₙ = 1
   · have hp1_zero : p₁ = 0 := le_antisymm (by linarith) hp₁
     subst hpₙ_one; subst hp1_zero
-    unfold A₁ Aₙ C₁ C₂ C₄
+    unfold Aₙ C₁ C₂ C₄
     norm_num
   -- Interior 0 < pₙ < 1: original argument applies
   have hpₙ_pos : 0 < pₙ := lt_of_le_of_ne hpₙ (Ne.symm hpₙ_zero)
   have hpₙ_lt : pₙ < 1 := lt_of_le_of_ne hpₙ1 hpₙ_one
   have hp₁1 : p₁ < 1 := by linarith
-  have hmin : min (A₁ p₁ pₙ) (Aₙ p₁ pₙ) = Aₙ p₁ pₙ :=
-    min_eq_right (Aₙ_le_A₁ hp₁pₙ hp₁pₙ1 hpₙ_pos hp₁1)
-  rw [hmin]
   rcases polynomial_core hp₁ hp₁pₙ hp₁pₙ1 with h | h | h
   · have hC : C₁ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₁_le_iff_L₂ hpₙ_pos hp₁1 hpₙ_lt).mpr h
-    have hle : C₁ p₁ pₙ ≤ Aₙ p₁ pₙ + 1/2 := by linarith
+    have hle : C₁ p₁ pₙ ≤ 1/2 + Aₙ p₁ pₙ := by linarith
     calc min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)
         ≤ min (C₁ p₁ pₙ) (C₂ p₁ pₙ) := min_le_left _ _
       _ ≤ C₁ p₁ pₙ := min_le_left _ _
-      _ ≤ Aₙ p₁ pₙ + 1/2 := hle
+      _ ≤ 1/2 + Aₙ p₁ pₙ := hle
   · have hC : C₂ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₂_le_iff_L₃ hpₙ_pos hp₁1 hpₙ_lt).mpr h
-    have hle : C₂ p₁ pₙ ≤ Aₙ p₁ pₙ + 1/2 := by linarith
+    have hle : C₂ p₁ pₙ ≤ 1/2 + Aₙ p₁ pₙ := by linarith
     calc min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)
         ≤ min (C₁ p₁ pₙ) (C₂ p₁ pₙ) := min_le_left _ _
       _ ≤ C₂ p₁ pₙ := min_le_right _ _
-      _ ≤ Aₙ p₁ pₙ + 1/2 := hle
+      _ ≤ 1/2 + Aₙ p₁ pₙ := hle
   · have hC : C₄ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₄_le_iff_L₅ hpₙ_pos hp₁1 hpₙ_lt).mpr h
-    have hle : C₄ p₁ pₙ ≤ Aₙ p₁ pₙ + 1/2 := by linarith
+    have hle : C₄ p₁ pₙ ≤ 1/2 + Aₙ p₁ pₙ := by linarith
     calc min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)
         ≤ C₄ p₁ pₙ := min_le_right _ _
-      _ ≤ Aₙ p₁ pₙ + 1/2 := hle
+      _ ≤ 1/2 + Aₙ p₁ pₙ := hle
 
 end

@@ -3,9 +3,6 @@ version = "0.1.0"
 defaultTargets = ["AddAdaptivityGap", "MulAdaptivityGap"]
 
 [[lean_lib]]
-name = "Adaptivity"
-
-[[lean_lib]]
 name = "AddAdaptivityGap"
 
 [[lean_lib]]

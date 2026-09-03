@@ -24,7 +24,6 @@ To check just one file without building the exe, `lake env lean Main.lean` works
 The repo looks like a stock `lake new` scaffold, but nearly all real content lives in one file:
 
 - [Main.lean](Main.lean) — the entire proof (~520 lines). Self-contained except for `import Mathlib`. Sets `maxHeartbeats 8000000` and `maxRecDepth 4000` at the top because several `nlinarith`/`ring` goals are expensive; do not lower these without checking every lemma still elaborates. The whole file is inside a `noncomputable section`.
-- [Adaptivity.lean](Adaptivity.lean) + [Adaptivity/Basic.lean](Adaptivity/Basic.lean) — empty scaffold (`def hello := "world"`). The `lean_lib` target in [lakefile.toml](lakefile.toml) exists only so `lake build` picks up the exe root `Main`. Do not put new proof content here unless you are actually modularizing — `Main.lean` is the source of truth.
 
 ## Proof architecture
 

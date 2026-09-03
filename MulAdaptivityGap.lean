@@ -1,12 +1,12 @@
 import Mathlib
 
 /-!
-# Adaptivity gap: `min (C₁, C₂, C₃) ≤ (6/5) · min (A₁, Aₙ)`
+# Adaptivity gap: `min (C₁, C₂, C₃) ≤ (1.2) · Aₙ`
 
 This file proves a single result, `adaptivity_gap`, bounding three candidate
-(non-adaptive) costs `C₁ pₙ`, `C₂ p₁ pₙ`, `C₃ p₁ pₙ` against the two adaptive
-costs `A₁ p₁ pₙ`, `Aₙ p₁ pₙ` for `0 ≤ p₁ ≤ pₙ`, `p₁ + pₙ ≤ 1`. The
-constant `6/5` is tight — see the `tight` witness at the bottom.
+(non-adaptive) costs `C₁ pₙ`, `C₂ p₁ pₙ`, `C₃ p₁ pₙ` against the adaptive
+cost `Aₙ p₁ pₙ` for `0 ≤ p₁ ≤ pₙ`, `p₁ + pₙ ≤ 1`. The constant `1.2` is
+tight, attained at `pₙ = 1/2`, `p₁ = 0`.
 
 The proof splits on the value of `pₙ`:
 * `pₙ ≤ 1/2`  — `C₁` works (`case1`), direct polynomial factoring.
@@ -29,20 +29,18 @@ open Real
 
 -- ═══════════════════ Main definitions ═══════════════════
 
--- `Aₙ` and `A₁` are the two adaptive costs; `Aₙ ≤ A₁` under our
--- hypotheses (see `Aₙ_le_A₁`), so the target `min` reduces to `Aₙ`.
+-- `Aₙ` is the adaptive cost the three candidates are measured against.
 def Aₙ (p₁ pₙ : ℝ) : ℝ := pₙ / (1 - p₁) + 1 / pₙ
-def A₁ (p₁ pₙ : ℝ) : ℝ := 1 / (1 - p₁) + (1 - p₁) / pₙ
 
 -- The three candidate non-adaptive costs. The goal is that for every
--- `(p₁, pₙ)` at least one of `C₁, C₂, C₃` is `≤ (6/5)·Aₙ`.
+-- `(p₁, pₙ)` at least one of `C₁, C₂, C₃` is `≤ (1.2)·Aₙ`.
 def C₁ (pₙ : ℝ) : ℝ := 1 / pₙ + pₙ / (1 - pₙ)
 def C₂ (p₁ pₙ : ℝ) : ℝ := 1 + p₁ / (1 - pₙ) + (1 - p₁) / pₙ
 def C₃ (p₁ pₙ : ℝ) : ℝ :=
   1 + pₙ * (1 + p₁) / (1 - p₁ * pₙ) + (1 - pₙ) * (2 - p₁) / (p₁ + pₙ - p₁ * pₙ)
 
--- `N₃` and `N₆` are `C₂ - (6/5)·Aₙ` and `C₃ - (6/5)·Aₙ` with positive
--- denominators cleared (see `C₂_le_iff_N₃`, `C₃_le_iff_N₆`). The "≤ (6/5)·Aₙ"
+-- `N₃` and `N₆` are `C₂ - (1.2)·Aₙ` and `C₃ - (1.2)·Aₙ` with positive
+-- denominators cleared (see `C₂_le_iff_N₃`, `C₃_le_iff_N₆`). The "≤ (1.2)·Aₙ"
 -- inequalities become purely polynomial statements `N₃ ≤ 0`, `N₆ ≤ 0`.
 def N₃ (p₁ pₙ : ℝ) : ℝ :=
   5 * p₁ ^ 2 * (1 - 2 * pₙ) + p₁ * (5 * pₙ ^ 2 + 4 * pₙ - 4) +
@@ -88,18 +86,18 @@ lemma two_roots_discrim_nonneg (a b c d r₁ r₂ : ℝ) (ha : a ≠ 0) (hr : r�
 -- ═══════════════════ Denominator clearing ═══════════════════
 --
 -- These two lemmas witness the equivalence between the rational bound
--- `C_i ≤ (6/5)·Aₙ` and the polynomial statement `N_i ≤ 0`. The trick is
--- the identity `N_i = (C_i - (6/5)·Aₙ) · P` where `P > 0` is the product
+-- `C_i ≤ (1.2)·Aₙ` and the polynomial statement `N_i ≤ 0`. The trick is
+-- the identity `N_i = (C_i - (1.2)·Aₙ) · P` where `P > 0` is the product
 -- of the cleared denominators; `field_simp; ring` discharges the identity
 -- and `nlinarith` uses `P > 0` to transfer signs in both directions.
 
 lemma C₂_le_iff_N₃ {p₁ pₙ : ℝ} (hpₙ0 : 0 < pₙ) (hpₙ1 : pₙ < 1) (hp₁1 : p₁ < 1) :
-    C₂ p₁ pₙ ≤ (6/5) * Aₙ p₁ pₙ ↔ N₃ p₁ pₙ ≤ 0 := by
+    C₂ p₁ pₙ ≤ (1.2) * Aₙ p₁ pₙ ↔ N₃ p₁ pₙ ≤ 0 := by
   have h1pₙ : (0 : ℝ) < 1 - pₙ := by linarith
   have h1p₁ : (0 : ℝ) < 1 - p₁ := by linarith
   have hP : (0 : ℝ) < 5 * pₙ * (1 - pₙ) * (1 - p₁) :=
     mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 5) hpₙ0) h1pₙ) h1p₁
-  have hid : N₃ p₁ pₙ = (C₂ p₁ pₙ - (6/5) * Aₙ p₁ pₙ) *
+  have hid : N₃ p₁ pₙ = (C₂ p₁ pₙ - (1.2) * Aₙ p₁ pₙ) *
       (5 * pₙ * (1 - pₙ) * (1 - p₁)) := by
     unfold N₃ C₂ Aₙ; field_simp; ring
   constructor
@@ -108,13 +106,13 @@ lemma C₂_le_iff_N₃ {p₁ pₙ : ℝ} (hpₙ0 : 0 < pₙ) (hpₙ1 : pₙ < 1)
 
 lemma C₃_le_iff_N₆ {p₁ pₙ : ℝ} (hp₁0 : 0 ≤ p₁) (hpₙ0 : 0 < pₙ) (hpₙ1 : pₙ < 1)
     (hp₁1 : p₁ < 1) :
-    C₃ p₁ pₙ ≤ (6/5) * Aₙ p₁ pₙ ↔ N₆ p₁ pₙ ≤ 0 := by
+    C₃ p₁ pₙ ≤ (1.2) * Aₙ p₁ pₙ ↔ N₆ p₁ pₙ ≤ 0 := by
   have h1 : (0 : ℝ) < 1 - p₁ * pₙ := by nlinarith
   have h2 : (0 : ℝ) < p₁ + pₙ - p₁ * pₙ := by nlinarith
   have h3 : (0 : ℝ) < 1 - p₁ := by linarith
   have hP : (0 : ℝ) < 5 * pₙ * (1 - p₁ * pₙ) * (p₁ + pₙ - p₁ * pₙ) * (1 - p₁) :=
     mul_pos (mul_pos (mul_pos (mul_pos (by norm_num : (0:ℝ) < 5) hpₙ0) h1) h2) h3
-  have hid : N₆ p₁ pₙ = (C₃ p₁ pₙ - (6/5) * Aₙ p₁ pₙ) *
+  have hid : N₆ p₁ pₙ = (C₃ p₁ pₙ - (1.2) * Aₙ p₁ pₙ) *
       (5 * pₙ * (1 - p₁ * pₙ) * (p₁ + pₙ - p₁ * pₙ) * (1 - p₁)) := by
     unfold N₆ C₃ Aₙ; field_simp; ring
   constructor
@@ -123,29 +121,10 @@ lemma C₃_le_iff_N₆ {p₁ pₙ : ℝ} (hp₁0 : 0 ≤ p₁) (hpₙ0 : 0 < p�
 
 -- ═══════════════════ Adaptive cost ═══════════════════
 --
--- Under the hypotheses `p₁ ≤ pₙ` and `p₁ + pₙ ≤ 1`, `Aₙ` is the smaller
--- adaptive cost. The assembly step in `adaptivity_gap` uses this to
--- rewrite `min (A₁ p₁ pₙ) (Aₙ p₁ pₙ) = Aₙ p₁ pₙ`, so it suffices to bound
--- the three `C_i` against `Aₙ` alone. `Aₙ_mono` is used in `case1` to
--- reduce to the `p₁ = 0` endpoint.
+-- `Aₙ_mono` is used in `case1` to reduce to the `p₁ = 0` endpoint.
 
-/-- `Aₙ ≤ A₁` when `p₁ ≤ pₙ` and `p₁ + pₙ ≤ 1`. The key algebraic identity is
-`(A₁ − Aₙ) · pₙ(1-p₁) = (pₙ − p₁)(1 − p₁ − pₙ)`; both factors on the right are
-nonneg under our hypotheses, so the difference has the same sign. -/
-lemma Aₙ_le_A₁ {p₁ pₙ : ℝ} (hp₁pₙ : p₁ ≤ pₙ) (hs : p₁ + pₙ ≤ 1) (hpₙ0 : 0 < pₙ)
-    (_hp₁1 : p₁ < 1) : Aₙ p₁ pₙ ≤ A₁ p₁ pₙ := by
-  have h1p₁ : (0 : ℝ) < 1 - p₁ := by linarith
-  suffices h : 0 ≤ A₁ p₁ pₙ - Aₙ p₁ pₙ by linarith
-  have hkey : (A₁ p₁ pₙ - Aₙ p₁ pₙ) * (pₙ * (1 - p₁)) =
-      (pₙ - p₁) * (1 - p₁ - pₙ) := by
-    unfold A₁ Aₙ; field_simp; ring
-  have hnum : 0 ≤ (pₙ - p₁) * (1 - p₁ - pₙ) := mul_nonneg (by linarith) (by linarith)
-  have hden : (0 : ℝ) < pₙ * (1 - p₁) := mul_pos hpₙ0 h1p₁
-  by_contra h_neg; simp only [not_le] at h_neg
-  linarith [mul_neg_of_neg_of_pos h_neg hden]
-
-/-- `Aₙ` is monotone in its first argument. Same pattern as `Aₙ_le_A₁`:
-the difference times a positive denominator equals `pₙ · (a₂ − a₁)`. -/
+/-- `Aₙ` is monotone in its first argument: the difference times a
+positive denominator equals `pₙ · (a₂ − a₁)`. -/
 lemma Aₙ_mono {a₁ a₂ pₙ : ℝ} (hpₙ0 : 0 < pₙ) (ha₂ : a₂ < 1) (h : a₁ ≤ a₂) :
     Aₙ a₁ pₙ ≤ Aₙ a₂ pₙ := by
   have h1 : (0 : ℝ) < 1 - a₂ := by linarith
@@ -160,26 +139,26 @@ lemma Aₙ_mono {a₁ a₂ pₙ : ℝ} (hpₙ0 : 0 < pₙ) (ha₂ : a₂ < 1) (h
 
 -- ═══════════════════ Case 1: pₙ ≤ 1/2 ═══════════════════
 
-/-- When `pₙ ≤ 1/2`, `C₁ pₙ` already beats `(6/5)·Aₙ p₁ pₙ`. Strategy: since
+/-- When `pₙ ≤ 1/2`, `C₁ pₙ` already beats `(1.2)·Aₙ p₁ pₙ`. Strategy: since
 `C₁ pₙ` does not depend on `p₁`, monotonicity of `Aₙ` in `p₁` lets us reduce
 to the endpoint `p₁ = 0`. At `p₁ = 0` the inequality factors as
 `(2pₙ − 1)(3pₙ² + pₙ + 1) ≤ 0`, with the second factor `> 0` (complete the
 square) and the first `≤ 0` by hypothesis. -/
 theorem case1 {p₁ pₙ : ℝ} (hp₁0 : 0 ≤ p₁) (hp₁1 : p₁ < 1) (hpₙ0 : 0 < pₙ)
-    (hpₙ1 : pₙ ≤ 1/2) : C₁ pₙ ≤ (6/5) * Aₙ p₁ pₙ := by
+    (hpₙ1 : pₙ ≤ 1/2) : C₁ pₙ ≤ (1.2) * Aₙ p₁ pₙ := by
   have hpₙ1' : (0 : ℝ) < 1 - pₙ := by linarith
   -- Reduce to `p₁ = 0` using `Aₙ` monotonicity.
-  suffices h0 : C₁ pₙ ≤ (6/5) * Aₙ 0 pₙ by
-    linarith [mul_le_mul_of_nonneg_left (Aₙ_mono hpₙ0 hp₁1 hp₁0) (by norm_num : (0:ℝ) ≤ 6/5)]
-  -- Polynomial identity: `(C₁ − (6/5)Aₙ) · positive = (2pₙ−1)(3pₙ²+pₙ+1)`.
-  suffices hprod : (C₁ pₙ - (6/5) * Aₙ 0 pₙ) * (5 * pₙ * (1 - pₙ)) =
+  suffices h0 : C₁ pₙ ≤ (1.2) * Aₙ 0 pₙ by
+    linarith [mul_le_mul_of_nonneg_left (Aₙ_mono hpₙ0 hp₁1 hp₁0) (by norm_num : (0:ℝ) ≤ 1.2)]
+  -- Polynomial identity: `(C₁ − (1.2)Aₙ) · positive = (2pₙ−1)(3pₙ²+pₙ+1)`.
+  suffices hprod : (C₁ pₙ - (1.2) * Aₙ 0 pₙ) * (5 * pₙ * (1 - pₙ)) =
       (2*pₙ - 1) * (3*pₙ^2 + pₙ + 1) by
     have hden : (0 : ℝ) < 5 * pₙ * (1 - pₙ) :=
       mul_pos (mul_pos (by norm_num : (0:ℝ) < 5) hpₙ0) hpₙ1'
     have hnum : (2*pₙ - 1) * (3*pₙ^2 + pₙ + 1) ≤ 0 :=
       mul_nonpos_of_nonpos_of_nonneg (by linarith) (by nlinarith [sq_nonneg (pₙ + 1/6)])
     by_contra h_neg; simp only [not_le] at h_neg
-    linarith [mul_pos (show (0:ℝ) < C₁ pₙ - 6/5 * Aₙ 0 pₙ by linarith) hden]
+    linarith [mul_pos (show (0:ℝ) < C₁ pₙ - 1.2 * Aₙ 0 pₙ by linarith) hden]
   unfold C₁ Aₙ; field_simp; ring
 
 -- ═══════════════════ Parabola lemma ═══════════════════
@@ -314,7 +293,7 @@ lemma N₆_disc_neg {pₙ : ℝ} (hpₙ_lo : 1/2 ≤ pₙ) (hpₙ_hi : pₙ ≤ 
 -- ═══════════════════ Case 2: 1/2 < pₙ ≤ 5/6 ═══════════════════
 
 /-- The hard case. On `1/2 < pₙ ≤ 5/6`, at least one of `N₃(p₁, pₙ)`,
-`N₆(p₁, pₙ)` is `≤ 0` (equivalently, one of `C₂`, `C₃` beats `(6/5)·Aₙ`).
+`N₆(p₁, pₙ)` is `≤ 0` (equivalently, one of `C₂`, `C₃` beats `(1.2)·Aₙ`).
 
 Proof is by contradiction, in nine steps (marked below):
   1. `N₃(0, pₙ) ≤ 0` from a direct factorization.
@@ -646,14 +625,14 @@ theorem case3 {p₁ pₙ : ℝ} (hp₁0 : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ 1-p�
 
 -- ═══════════════════ Assembly ═══════════════════
 
-/-- At least one of the three candidates beats `(6/5)·Aₙ` on the interior
+/-- At least one of the three candidates beats `(1.2)·Aₙ` on the interior
 `0 < pₙ < 1`. Dispatches on `pₙ` into the three cases and uses the
 denominator-clearing equivalences to convert case 2/3's polynomial
 conclusions back to the rational form. -/
 theorem bound_lower_half {p₁ pₙ : ℝ} (hp₁0 : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hpₙ0 : 0 < pₙ)
     (hpₙ1 : pₙ < 1) (hp₁1 : p₁ < 1) (hs : p₁ + pₙ ≤ 1) :
-    C₁ pₙ ≤ (6/5) * Aₙ p₁ pₙ ∨ C₂ p₁ pₙ ≤ (6/5) * Aₙ p₁ pₙ ∨
-    C₃ p₁ pₙ ≤ (6/5) * Aₙ p₁ pₙ := by
+    C₁ pₙ ≤ (1.2) * Aₙ p₁ pₙ ∨ C₂ p₁ pₙ ≤ (1.2) * Aₙ p₁ pₙ ∨
+    C₃ p₁ pₙ ≤ (1.2) * Aₙ p₁ pₙ := by
   by_cases hpₙ2 : pₙ ≤ 1/2
   · exact Or.inl (case1 hp₁0 hp₁1 hpₙ0 hpₙ2)
   · simp only [not_le] at hpₙ2
@@ -666,50 +645,48 @@ theorem bound_lower_half {p₁ pₙ : ℝ} (hp₁0 : 0 ≤ p₁) (hp₁pₙ : p�
         (case3 hp₁0 (by linarith) hpₙ4 hpₙ1)))
 
 /-- **Main result.** For `0 ≤ p₁ ≤ pₙ`, `p₁ + pₙ ≤ 1`, `pₙ ≤ 1`,
-`min (C₁ pₙ, C₂ p₁ pₙ, C₃ p₁ pₙ) ≤ (6/5) · min (A₁, Aₙ)` — i.e. at least
-one of the three nonadaptive candidates is within a factor `6/5` of the
-better adaptive cost.
+`min (C₁ pₙ, C₂ p₁ pₙ, C₃ p₁ pₙ) ≤ (1.2) · Aₙ p₁ pₙ` — i.e. at least
+one of the three nonadaptive candidates is within a factor `1.2` of the
+adaptive cost.
 
 Handles the boundary cases `pₙ = 0` and `pₙ = 1` (which force `p₁ = 0` and
 make all the `C_i` division-by-zero junk that happens to evaluate in a
-way `norm_num` can dispose of), then delegates to `bound_lower_half`
-after rewriting `min = Aₙ` via `Aₙ_le_A₁`. -/
+way `norm_num` can dispose of), then delegates to `bound_lower_half`. -/
 theorem adaptivity_gap {p₁ pₙ : ℝ} (hp₁0 : 0 ≤ p₁) (hp₁1 : p₁ ≤ 1) (hpₙ0 : 0 ≤ pₙ)
     (hpₙ1 : pₙ ≤ 1) (hp₁pₙ : p₁ ≤ pₙ) (hs : p₁ + pₙ ≤ 1) :
     min (min (C₁ pₙ) (C₂ p₁ pₙ)) (C₃ p₁ pₙ)
-      ≤ (6/5) * min (A₁ p₁ pₙ) (Aₙ p₁ pₙ) := by
+      ≤ (1.2) * Aₙ p₁ pₙ := by
   -- Boundary case pₙ = 0 (forces p₁ = 0; all costs are junk values via div-by-zero)
   rcases eq_or_lt_of_le hpₙ0 with rfl | hpₙ0'
   · have : p₁ = 0 := le_antisymm (by linarith) hp₁0; subst this
-    have hC : C₁ 0 ≤ (6/5) * min (A₁ 0 0) (Aₙ 0 0) := by
-      unfold C₁ A₁ Aₙ; norm_num
+    have hC : C₁ 0 ≤ (1.2) * Aₙ 0 0 := by
+      unfold C₁ Aₙ; norm_num
     calc min (min (C₁ 0) (C₂ 0 0)) (C₃ 0 0)
         ≤ min (C₁ 0) (C₂ 0 0) := min_le_left _ _
       _ ≤ C₁ 0 := min_le_left _ _
-      _ ≤ (6/5) * min (A₁ 0 0) (Aₙ 0 0) := hC
+      _ ≤ (1.2) * Aₙ 0 0 := hC
   -- Boundary case pₙ = 1 (forces p₁ = 0 from p₁ + pₙ ≤ 1)
   rcases eq_or_lt_of_le hpₙ1 with rfl | hpₙ1'
   · have : p₁ = 0 := le_antisymm (by linarith) hp₁0; subst this
-    have hC : C₁ 1 ≤ (6/5) * min (A₁ 0 1) (Aₙ 0 1) := by
-      unfold C₁ A₁ Aₙ; norm_num
+    have hC : C₁ 1 ≤ (1.2) * Aₙ 0 1 := by
+      unfold C₁ Aₙ; norm_num
     calc min (min (C₁ 1) (C₂ 0 1)) (C₃ 0 1)
         ≤ min (C₁ 1) (C₂ 0 1) := min_le_left _ _
       _ ≤ C₁ 1 := min_le_left _ _
-      _ ≤ (6/5) * min (A₁ 0 1) (Aₙ 0 1) := hC
-  -- Interior: 0 < pₙ < 1. Reduce `min` to `Aₙ` and dispatch.
+      _ ≤ (1.2) * Aₙ 0 1 := hC
+  -- Interior: 0 < pₙ < 1. Dispatch on which candidate wins.
   have hp₁1' : p₁ < 1 := by linarith
-  rw [min_eq_right (Aₙ_le_A₁ hp₁pₙ hs hpₙ0' hp₁1')]
   rcases bound_lower_half hp₁0 hp₁pₙ hpₙ0' hpₙ1' hp₁1' hs with h | h | h
   · calc min (min (C₁ pₙ) (C₂ p₁ pₙ)) (C₃ p₁ pₙ)
         ≤ min (C₁ pₙ) (C₂ p₁ pₙ) := min_le_left _ _
       _ ≤ C₁ pₙ := min_le_left _ _
-      _ ≤ (6/5) * Aₙ p₁ pₙ := h
+      _ ≤ (1.2) * Aₙ p₁ pₙ := h
   · calc min (min (C₁ pₙ) (C₂ p₁ pₙ)) (C₃ p₁ pₙ)
         ≤ min (C₁ pₙ) (C₂ p₁ pₙ) := min_le_left _ _
       _ ≤ C₂ p₁ pₙ := min_le_right _ _
-      _ ≤ (6/5) * Aₙ p₁ pₙ := h
+      _ ≤ (1.2) * Aₙ p₁ pₙ := h
   · calc min (min (C₁ pₙ) (C₂ p₁ pₙ)) (C₃ p₁ pₙ)
         ≤ C₃ p₁ pₙ := min_le_right _ _
-      _ ≤ (6/5) * Aₙ p₁ pₙ := h
+      _ ≤ (1.2) * Aₙ p₁ pₙ := h
 
 end

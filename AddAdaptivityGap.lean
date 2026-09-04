@@ -1,25 +1,34 @@
-/-
-  The Additive Adaptivity Gap for Two-Coin Sequential Stopping is 1/2
-
-  We prove: for 0 ≤ p₁ ≤ pₙ ≤ 1 with p₁+pₙ ≤ 1, the minimum
-  of three nonadaptive expected costs C₁, C₂, C₄ is at most
-  `1/2 + Aₙ p₁ pₙ`, where Aₙ is the cheaper of the two adaptive costs on
-  this domain — i.e., some nonadaptive strategy achieves additive
-  gap ≤ 1/2.
-
-  The polynomial core works without division via slack polynomials L₂, L₃, L₅
-  (`polynomial_core`); the equivalence `0 ≤ L_i ↔ C_i - Aₙ ≤ 1/2` is proved
-  by clearing denominators (`C_*_le_iff_L_*`). All polynomial identities
-  verified by `ring`; inequalities by `nlinarith` with explicit SOS witnesses.
--/
-
 import Mathlib
+
+/-!
+# Additive adaptivity gap for the Unlimited-Flips Unanimous Vote problem
+
+`min (C₁, C₂, C₄) ≤ 1/2 + Aₙ`
+
+We prove: for `0 ≤ p₁ ≤ pₙ ≤ 1` with `p₁ + pₙ ≤ 1`, the minimum of the three
+nonadaptive expected costs `C₁ p₁ pₙ`, `C₂ p₁ pₙ`, `C₄ p₁ pₙ` is at most
+`1/2 + Aₙ p₁ pₙ`, where `Aₙ` is the cheaper of the two adaptive costs on this
+domain — i.e., some nonadaptive strategy achieves additive gap ≤ 1/2.
+
+The proof splits on the value of `pₙ` (`polynomial_core`):
+* `pₙ ≤ 1/2` — `C₁` works (`L₂_nonneg_of_q_le_half`), by direct SOS on `L₂`.
+* `1/2 < pₙ ≤ 2/3` — `C₂` works (`L₃_nonneg_of_q_le_two_thirds`), splitting on
+  the sign of the coefficient `pₙ² + 3pₙ - 2` and using `L₃_complete_square`.
+* `2/3 < pₙ` — either `L₃ ≥ 0` and `C₂` works, or `L₃ < 0`, which forces
+  `Δ = p₁·M - (1-pₙ)² ≥ 0` (`Delta_nonneg_of_L₃_nonpos`) and hence `L₅ ≥ 0`
+  (`L₅_nonneg_of_Delta_nonneg`), so `C₄` works.
+
+The polynomial core works without division via the slack polynomials L₂, L₃, L₅;
+the equivalence `0 ≤ L_i ↔ C_i - Aₙ ≤ 1/2` is proved by clearing denominators
+(`C₁_le_iff_L₂`, `C₂_le_iff_L₃`, `C₄_le_iff_L₅`). All polynomial identities are
+verified by `ring`; inequalities by `nlinarith` with explicit SOS witnesses.
+
+The `noncomputable section` is because of the rationals-as-reals.
+-/
 
 noncomputable section
 
-/-! ## Polynomial Definitions -/
-
-/-! ## Rational-form Costs and Equivalence
+/-! ## Main definitions
 
   C₁, C₂, C₄ are the three nonadaptive expected costs (originally derived as
   S_2, S_3, S_5 in the slack analysis); Aₙ is the adaptive cost. Each L_i
@@ -49,7 +58,7 @@ def P (pₙ : ℝ) : ℝ := 8*pₙ^4 - 18*pₙ^3 + 22*pₙ^2 - 15*pₙ + 4
 def g (pₙ : ℝ) : ℝ := 8*pₙ^3 - 8*pₙ^2 - pₙ + 2
 def E (p₁ pₙ : ℝ) : ℝ := 2*(1 - pₙ)^2 + 2*M pₙ*(1 - pₙ + p₁) + (-4*pₙ^3 - 2*pₙ^2 + 10*pₙ - 6)
 
-/-! ## SOS Certificates -/
+/-! ## SOS certificates -/
 
 theorem M_pos (pₙ : ℝ) : 0 < M pₙ := by
   unfold M; nlinarith [sq_nonneg (2*pₙ - 1)]
@@ -75,7 +84,7 @@ theorem quartic_nonneg {pₙ : ℝ} (hpₙ : 2/3 ≤ pₙ) :
     0 ≤ 2*pₙ^4 - 4*pₙ^3 + 11*pₙ^2 - 9*pₙ + 2 := by
   nlinarith [sq_nonneg (3*pₙ - 2), quad_6_4_25_pos pₙ]
 
-/-! ## Polynomial Identities (verified by `ring`) -/
+/-! ## Polynomial identities -/
 
 theorem L₃_factorization (p₁ pₙ : ℝ) :
     (M pₙ)^2 * L₃ p₁ pₙ = pₙ^2*(1 - pₙ)*P pₙ +
@@ -103,7 +112,7 @@ theorem L₃_complete_square (p₁ pₙ : ℝ) :
       (3*pₙ - 2)*(11*pₙ^3 - 12*pₙ^2 + 7*pₙ - 2) := by
   unfold L₃ R₃; ring
 
-/-! ## Case A: L₂ ≥ 0 for pₙ ≤ 1/2 -/
+/-! ## Case 1: pₙ ≤ 1/2 -/
 
 theorem L₂_nonneg_of_q_le_half {p₁ pₙ : ℝ}
     (hp₁ : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hp₁pₙ1 : p₁ + pₙ ≤ 1) (hpₙ : pₙ ≤ 1/2) :
@@ -113,7 +122,7 @@ theorem L₂_nonneg_of_q_le_half {p₁ pₙ : ℝ}
   · nlinarith [sq_nonneg (1 - pₙ)]
   · push Not at hpₙ3; nlinarith
 
-/-! ## Case B: L₃ ≥ 0 for 1/2 < pₙ ≤ 2/3 -/
+/-! ## Case 2: 1/2 < pₙ ≤ 2/3 -/
 
 theorem L₃_nonneg_case1 {p₁ pₙ : ℝ}
     (hp₁ : 0 ≤ p₁) (hpₙ12 : 1/2 ≤ pₙ)
@@ -151,7 +160,7 @@ theorem L₃_nonneg_of_q_le_two_thirds {p₁ pₙ : ℝ}
   · push Not at hcoeff
     exact L₃_nonneg_case2 hp₁ hp₁pₙ1 hpₙ12 hpₙ23 hcoeff
 
-/-! ## Step 3a: L₃ ≤ 0 ⟹ p₁M ≥ (1-pₙ)²
+/-! ## Case 3a: L₃ ≤ 0 ⟹ p₁M ≥ (1-pₙ)²
 
   From M²L₃ = pₙ²(1-pₙ)P + Δ·Q: if Δ < 0 and pₙ ≥ 2/3, then Q ≤ 0,
   so Δ·Q ≥ 0, giving M²L₃ > 0. This contradicts L₃ ≤ 0.
@@ -191,7 +200,7 @@ theorem Delta_nonneg_of_L₃_nonpos {p₁ pₙ : ℝ}
   -- But M²L₃ ≤ 0 since M² ≥ 0 and L₃ ≤ 0
   nlinarith [sq_nonneg (M pₙ), mul_nonneg (sq_nonneg (M pₙ)) (show 0 ≤ -L₃ p₁ pₙ by linarith)]
 
-/-! ## Step 3b: p₁M ≥ (1-pₙ)² ⟹ L₅ ≥ 0
+/-! ## Case 3b: p₁M ≥ (1-pₙ)² ⟹ L₅ ≥ 0
 
   (2pₙ-1)ML₅ = (1-pₙ-p₁)pₙP + MΔg - Δ(1-pₙ-p₁)(2pₙ-1)E
   All three RHS terms are nonneg when Δ ≥ 0, pₙ > 1/2, (p₁,pₙ) ∈ R₁.
@@ -233,8 +242,11 @@ theorem L₅_nonneg_of_Delta_nonneg {p₁ pₙ : ℝ}
   rw [mul_zero] at this
   linarith
 
-/-! ## Polynomial Core -/
+/-! ## Polynomial core -/
 
+/-- At least one of the three slack polynomials is nonnegative on the domain.
+Dispatches on `pₙ` into the three cases; the denominator-clearing equivalences
+turn this into the rational-form statement. -/
 theorem polynomial_core {p₁ pₙ : ℝ}
     (hp₁ : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hp₁pₙ1 : p₁ + pₙ ≤ 1) :
     0 ≤ L₂ p₁ pₙ ∨ 0 ≤ L₃ p₁ pₙ ∨ 0 ≤ L₅ p₁ pₙ := by
@@ -257,6 +269,8 @@ theorem polynomial_core {p₁ pₙ : ℝ}
           (le_of_lt hpₙ23) (le_of_lt hL3)
         exact Or.inr (Or.inr
           (L₅_nonneg_of_Delta_nonneg hp₁ hp₁pₙ hp₁pₙ1 hpₙ12 hDelta))
+
+/-! ## Denominator clearing -/
 
 lemma nonpos_of_div_nonpos_of_pos {x d : ℝ} (hd : 0 < d) (h : x / d ≤ 0) :
     x ≤ 0 := by
@@ -362,7 +376,7 @@ lemma C₄_le_iff_L₅ {p₁ pₙ : ℝ}
     rw [← C₄_normalized hpₙ hp₁1 hpₙ1] at h'
     linarith
 
-/-! ## Main Theorem
+/-! ## Assembly
 
   At least one of the three nonadaptive costs C₁, C₂, C₄ is within 1/2 of
   the better adaptive cost: `min (C₁, C₂, C₄) ≤ 1/2 + Aₙ`. This is the
@@ -370,28 +384,35 @@ lemma C₄_le_iff_L₅ {p₁ pₙ : ℝ}
   on this domain, by the identity
   `(A₁ − Aₙ) · pₙ(1 − p₁) = (pₙ − p₁)(1 − p₁ − pₙ) ≥ 0`. -/
 
+/-- **Main result.** For `0 ≤ p₁ ≤ pₙ`, `p₁ + pₙ ≤ 1`, `pₙ ≤ 1`,
+`min (C₁ p₁ pₙ, C₂ p₁ pₙ, C₄ p₁ pₙ) ≤ 1/2 + Aₙ p₁ pₙ` — i.e. at least one of
+the three nonadaptive candidates is within `1/2` of the adaptive cost.
+
+Handles the boundary cases `pₙ = 0` and `pₙ = 1` (which force `p₁ = 0` and make
+all the `C_i` division-by-zero junk that happens to evaluate in a way `norm_num`
+can dispose of), then delegates to `polynomial_core`. -/
 theorem add_adaptivity_gap {p₁ pₙ : ℝ}
-    (hp₁ : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hp₁pₙ1 : p₁ + pₙ ≤ 1)
-    (hpₙ : 0 ≤ pₙ) (hpₙ1 : pₙ ≤ 1) :
+    (hp₁0 : 0 ≤ p₁) (hp₁pₙ : p₁ ≤ pₙ) (hs : p₁ + pₙ ≤ 1) (hpₙ1 : pₙ ≤ 1) :
     min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)
       ≤ 1/2 + Aₙ p₁ pₙ := by
+  have hpₙ0 : 0 ≤ pₙ := hp₁0.trans hp₁pₙ
   -- Boundary pₙ = 0: hypotheses force p₁ = 0; expressions degenerate via x/0 = 0
   by_cases hpₙ_zero : pₙ = 0
-  · have hp1_zero : p₁ = 0 := le_antisymm (by linarith) hp₁
+  · have hp1_zero : p₁ = 0 := le_antisymm (by linarith) hp₁0
     subst hpₙ_zero; subst hp1_zero
     unfold Aₙ C₁ C₂ C₄
     norm_num
   -- Boundary pₙ = 1: p₁ + pₙ ≤ 1 forces p₁ = 0
   by_cases hpₙ_one : pₙ = 1
-  · have hp1_zero : p₁ = 0 := le_antisymm (by linarith) hp₁
+  · have hp1_zero : p₁ = 0 := le_antisymm (by linarith) hp₁0
     subst hpₙ_one; subst hp1_zero
     unfold Aₙ C₁ C₂ C₄
     norm_num
   -- Interior 0 < pₙ < 1: original argument applies
-  have hpₙ_pos : 0 < pₙ := lt_of_le_of_ne hpₙ (Ne.symm hpₙ_zero)
+  have hpₙ_pos : 0 < pₙ := lt_of_le_of_ne hpₙ0 (Ne.symm hpₙ_zero)
   have hpₙ_lt : pₙ < 1 := lt_of_le_of_ne hpₙ1 hpₙ_one
   have hp₁1 : p₁ < 1 := by linarith
-  rcases polynomial_core hp₁ hp₁pₙ hp₁pₙ1 with h | h | h
+  rcases polynomial_core hp₁0 hp₁pₙ hs with h | h | h
   · have hC : C₁ p₁ pₙ - Aₙ p₁ pₙ ≤ 1/2 := (C₁_le_iff_L₂ hpₙ_pos hp₁1 hpₙ_lt).mpr h
     have hle : C₁ p₁ pₙ ≤ 1/2 + Aₙ p₁ pₙ := by linarith
     calc min (min (C₁ p₁ pₙ) (C₂ p₁ pₙ)) (C₄ p₁ pₙ)

@@ -16,9 +16,9 @@ First build fetches Mathlib and is slow; later builds are incremental. Single fi
 
 | | [MulAdaptivityGap.lean](MulAdaptivityGap.lean) | [AddAdaptivityGap.lean](AddAdaptivityGap.lean) |
 | --- | --- | --- |
-| Main theorem | [`adaptivity_gap`:655](MulAdaptivityGap.lean#L655) — `min (C₁, C₂, C₃) ≤ 1.2 * Aₙ` | [`add_adaptivity_gap`:373](AddAdaptivityGap.lean#L373) — `min (C₁, C₂, C₄) ≤ 1/2 + Aₙ` |
-| Cost definitions | [`Aₙ`, `C₁`, `C₂`, `C₃`:33-43](MulAdaptivityGap.lean#L33-L43) | [`Aₙ`, `C₁`, `C₂`, `C₄`:28-39](AddAdaptivityGap.lean#L28-L39) |
-| Polynomial forms | [`N₃`, `N₆`:45-51](MulAdaptivityGap.lean#L45-L51) | [`L₂`, `L₃`, `L₅`:41-50](AddAdaptivityGap.lean#L41-L50) |
-| Polynomial core | [`bound_lower_half`:632](MulAdaptivityGap.lean#L632) | [`polynomial_core`:238](AddAdaptivityGap.lean#L238) |
+| Main theorem | [`mul_adaptivity_gap`:663](MulAdaptivityGap.lean#L663) — `min (C₁, C₂, C₃) ≤ 1.2 * Aₙ` | [`add_adaptivity_gap`:394](AddAdaptivityGap.lean#L394) — `min (C₁, C₂, C₄) ≤ 1/2 + Aₙ` |
+| Cost definitions | [`Aₙ`, `C₁`, `C₂`, `C₃`:42-49](MulAdaptivityGap.lean#L42-L49) | [`Aₙ`, `C₁`, `C₂`, `C₄`:37-48](AddAdaptivityGap.lean#L37-L48) |
+| Polynomial forms | [`N₃`, `N₆`:53-58](MulAdaptivityGap.lean#L53-L58) | [`L₂`, `L₃`, `L₅`:50-59](AddAdaptivityGap.lean#L50-L59) |
+| Polynomial core | [`bound_lower_half`:640](MulAdaptivityGap.lean#L640) | [`polynomial_core`:250](AddAdaptivityGap.lean#L250) |
 
 Both hold on `0 ≤ p₁ ≤ pₙ ≤ 1` with `p₁ + pₙ ≤ 1`.
